@@ -8,7 +8,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "chmod a+x buildtestimage.sh && ./buildtestimage.sh c3pobot/node-monitor"
+    "build": "chmod a+x buildtestimage.sh && ./buildtestimage.sh c3po-k8s/node-monitor",
+    "prod": "chmod a+x buildprodimage.sh && ./buildprodimage.sh c3po-k8s/node-monitor"
   },
   "author": "",
   "license": "ISC",
