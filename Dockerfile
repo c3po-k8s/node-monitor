@@ -4,6 +4,7 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 FROM node:20-alpine AS app
+LABEL org.opencontainers.image.source https://github.com/c3po-k8s/node-monitor
 WORKDIR /app
 RUN apk update && \
   # wrap process in --init in order to handle kernel signals

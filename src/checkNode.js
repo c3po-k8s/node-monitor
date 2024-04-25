@@ -1,10 +1,8 @@
 'use strict'
 const log = require('./logger');
 const k8s = require('@kubernetes/client-node');
-const { checkPods, getPods } = require('./checkPods')
-const kc = new k8s.KubeConfig();
-kc.loadFromDefault();
-const coreApi = kc.makeApiClient(k8s.CoreV1Api);
+const { coreApi, kc } = require('./k8Api');
+const { checkPods, getPods } = require('./checkPods');
 
 const IGNORE_LABEL = process.env.IGNORE_LABEL || 'monitor-ignore'
 const checkNode = async(node = {}) =>{
