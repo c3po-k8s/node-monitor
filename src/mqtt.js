@@ -26,7 +26,7 @@ client.on('connect', ()=>{
 })
 module.exports.send = async(set = {})=>{
   try{
-    await client.publish(`k8-status/${set.type}/${set.namespace}/${set.name}`, JSON.stringify(set), { qos: 1, retain: true })
+    await client.publish(`k8-status/${set.type}/${set.namespace}/${set.name}`, JSON.stringify(set), { qos: 1 })
     return true
   }catch(e){
     throw(e)

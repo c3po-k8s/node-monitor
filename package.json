@@ -5,7 +5,8 @@
     "chalk": "^4.1.0",
     "compression": "^1.7.4",
     "express": "^4.19.2",
-    "mqtt": "^5.5.0"
+    "mqtt": "^5.5.0",
+    "rabbitmq-client": "^4.5.4"
   },
   "name": "node-monitor",
   "version": "1.0.0",

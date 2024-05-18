@@ -1,26 +1,13 @@
 const log = require('./logger')
 const k8s = require('@kubernetes/client-node');
 const { appsApi, kc } = require('./k8Api');
-const mqtt = require('./mqtt')
+const rabbitmq = require('./rabbitmq')
 const IGNORE_LABEL = process.env.IGNORE_LABEL || 'monitor-ignore'
-let mqttStatus
+const POD_NAME = process.env.POD_NAME || 'node-monitor'
 
 const setFn = () => appsApi.listStatefulSetForAllNamespaces()
 const informer = k8s.makeInformer(kc, '/apis/apps/v1/statefulsets', setFn);
 
-const updateSet = async(set = {})=>{
-  try{
-    let status
-    if(!mqttStatus) mqttStatus = mqtt.status()
-    if(mqttStatus) status = await mqtt.send(set)
-    if(status) return
-    setTimeout(()=>updateSet(set), 5000)
-  }catch(e){
-    log.error(e)
-    setTimeout(()=>updateSet(set), 5000)
-  }
-  //log.info(set)
-}
 informer.on('error', (err) => {
     log.error(err);
     // Restart informer after 5sec
@@ -29,10 +16,12 @@ informer.on('error', (err) => {
     }, 5000);
 });
 informer.on('add', (set = {})=>{
-  updateSet({ name: set?.metadata?.name, namespace: set?.metadata.namespace, replicas: set?.spec.replicas, type: 'statefulset' })
+  rabbitmq.send({ name: set?.metadata?.name, namespace: set?.metadata.namespace, replicas: set?.spec.replicas, type: 'statefulset', timestamp: Date.now() })
+
 })
 informer.on('update', (set = {})=>{
-  updateSet({ name: set?.metadata?.name, namespace: set?.metadata.namespace, replicas: set?.spec.replicas, type: 'statefulset' })
+  rabbitmq.send({ name: set?.metadata?.name, namespace: set?.metadata.namespace, replicas: set?.spec.replicas, type: 'statefulset', timestamp: Date.now() })
+  //rabbitmq.send(`statefulset.${data.namespace}.${data.name}`, data)
 })
 const startInformer = async()=>{
   try{
