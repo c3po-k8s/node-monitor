@@ -2,6 +2,7 @@ const log = require('./logger')
 const k8s = require('@kubernetes/client-node');
 const { appsApi, kc } = require('./k8Api');
 const rabbitmq = require('./rabbitmq')
+const getSetInfo = require('./getSetInfo')
 const IGNORE_LABEL = process.env.IGNORE_LABEL || 'monitor-ignore'
 const POD_NAME = process.env.POD_NAME || 'node-monitor'
 
@@ -16,11 +17,11 @@ informer.on('error', (err) => {
     }, 5000);
 });
 informer.on('add', (set = {})=>{
-  rabbitmq.send({ name: set?.metadata?.name, namespace: set?.metadata.namespace, replicas: set?.spec.replicas, type: 'statefulset', timestamp: Date.now() })
+  rabbitmq.send(getSetInfo(set, 'statefulset'))
 
 })
 informer.on('update', (set = {})=>{
-  rabbitmq.send({ name: set?.metadata?.name, namespace: set?.metadata.namespace, replicas: set?.spec.replicas, type: 'statefulset', timestamp: Date.now() })
+  rabbitmq.send(getSetInfo(set, 'statefulset'))
   //rabbitmq.send(`statefulset.${data.namespace}.${data.name}`, data)
 })
 const startInformer = async()=>{

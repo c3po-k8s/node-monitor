@@ -7,6 +7,7 @@ const start = ()=>{
       require('./nodeInformer')
       require('./statefulSetInformer')
       require('./deploymentInformer')
+      require('./podInformer')
       require('./express')
       return
     }

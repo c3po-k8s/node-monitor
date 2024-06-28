@@ -1,13 +1,13 @@
 const log = require('./logger')
 const k8s = require('@kubernetes/client-node');
-const { appsApi, kc } = require('./k8Api');
+const { coreApi, kc } = require('./k8Api');
 const rabbitmq = require('./rabbitmq')
-const getSetInfo = require('./getSetInfo')
+const getPodInfo = require('./getPodInfo')
 const IGNORE_LABEL = process.env.IGNORE_LABEL || 'monitor-ignore'
 let mqttStatus
 
-const setFn = () => appsApi.listDeploymentForAllNamespaces()
-const informer = k8s.makeInformer(kc, '/apis/apps/v1/deployments', setFn);
+const setFn = () => coreApi.listPodForAllNamespaces()
+const informer = k8s.makeInformer(kc, '/api/v1/pods', setFn);
 
 informer.on('error', (err) => {
     log.error(err);
@@ -16,16 +16,16 @@ informer.on('error', (err) => {
         startInformer();
     }, 5000);
 });
-informer.on('add', (set = {})=>{
-  rabbitmq.send(getSetInfo(set, 'deployment'))
+informer.on('add', (pod = {})=>{
+  rabbitmq.send(getPodInfo(pod))
 })
-informer.on('update', (set = {})=>{
-  rabbitmq.send(getSetInfo(set, 'deployment'))
+informer.on('update', (pod = {})=>{
+  rabbitmq.send(getPodInfo(pod))
 })
 const startInformer = async()=>{
   try{
     await informer.start()
-    log.info(`Deployment informer started...`)
+    log.info(`pod informer started...`)
   }catch(err){
     if(err?.body?.message){
       log.error(`Code: ${err.body.code}, Msg: ${err.body.message}`)

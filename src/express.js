@@ -19,6 +19,9 @@ app.get('/get/:type/:nameSpace/:setName', (req, res)=>{
 app.get('/replicas/:type/:nameSpace/:setName', (req, res)=>{
   handleGetReplicasRequest(req, res)
 })
+app.use('/api', (req, res)=>{
+  res.send('coming soon...')
+})
 const handleGetSetRequest = async(req, res)=>{
   try{
     if(!req?.params) throw(`no payload provided`)

@@ -38,6 +38,7 @@ module.exports.ready = ()=>{
 }
 module.exports.send = async(data = {})=>{
   if(!data?.type || !data?.namespace || !data?.name) return
+  await publisher.send({ exchange: exchangeName, routingKey: 'all' }, data)
   await publisher.send({ exchange: exchangeName, routingKey: `${data.type}.${data.namespace}.${data.name}` }, data)
   return true
 }
